@@ -33,28 +33,28 @@ pub fn write_tmp(bytes: Vec<u8>) -> io::Result<NamedTempFile> {
 pub fn to_u8_16(input: &[u8]) -> [u8; 16] {
     assert_eq!(input.len(), 16);
     let mut bytes = [0u8; 16];
-    bytes.copy_from_slice(&input);
+    bytes.copy_from_slice(input);
     bytes
 }
 
 pub fn to_u8_30(input: &[u8]) -> [u8; 30] {
     assert_eq!(input.len(), 30);
     let mut bytes = [0u8; 30];
-    bytes.copy_from_slice(&input);
+    bytes.copy_from_slice(input);
     bytes
 }
 
 pub fn to_u8_32(input: &[u8]) -> [u8; 32] {
     assert_eq!(input.len(), 32);
     let mut bytes = [0u8; 32];
-    bytes.copy_from_slice(&input);
+    bytes.copy_from_slice(input);
     bytes
 }
 
 pub fn to_u8_64(input: &[u8]) -> [u8; 64] {
     assert_eq!(input.len(), 64);
     let mut bytes = [0u8; 64];
-    bytes.copy_from_slice(&input);
+    bytes.copy_from_slice(input);
     bytes
 }
 
@@ -82,7 +82,7 @@ pub fn random_encrypt_ballots<E: Element, G: Group<E>>(
     let cs: Vec<Ciphertext<E>> = plaintexts
         .par_iter()
         .map(|p| {
-            let encoded = pk.group.encode(&p);
+            let encoded = pk.group.encode(p);
             pk.encrypt(&encoded)
         })
         .collect();

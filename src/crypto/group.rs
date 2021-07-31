@@ -65,7 +65,7 @@ pub trait Group<E: Element>: Clone + Send + Sync + Serialize + BTree {
     }
     fn schnorr_verify(&self, public: &E, g: &E, proof: &Schnorr<E>, label: &[u8]) -> bool {
         let challenge_ =
-            schnorr_proof_challenge(g, &public, &proof.commitment, &*self.challenger(), label);
+            schnorr_proof_challenge(g, public, &proof.commitment, &*self.challenger(), label);
         let ok1 = challenge_.eq(&proof.challenge);
         let lhs = g.mod_pow(&proof.response, &self.modulus());
         let rhs = proof
@@ -129,7 +129,7 @@ pub trait Group<E: Element>: Clone + Send + Sync + Serialize + BTree {
             &proof.commitment1,
             &proof.commitment2,
             &*self.challenger(),
-            &label,
+            label,
         );
         let ok1 = challenge_.eq(&proof.challenge);
 

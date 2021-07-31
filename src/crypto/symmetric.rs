@@ -31,7 +31,7 @@ pub fn encrypt(key: GenericArray<u8, U32>, bytes: &[u8]) -> (Vec<u8>, Vec<u8>) {
 }
 
 pub fn decrypt(key: GenericArray<u8, U32>, iv_bytes: &[u8], ciphertext: &[u8]) -> Vec<u8> {
-    let iv: GenericArray<_, U16> = GenericArray::clone_from_slice(&iv_bytes);
+    let iv: GenericArray<_, U16> = GenericArray::clone_from_slice(iv_bytes);
     let cipher = Aes256Cbc::new_fix(&key, &iv);
     cipher.decrypt(&mut ciphertext.to_vec()).unwrap().to_vec()
 }

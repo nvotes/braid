@@ -32,7 +32,7 @@ impl<E: Element, G: Group<E>> Keymaker<E, G> {
         let group = &self.sk.group;
 
         let pk = PublicKey::<E, G>::from(&self.pk.value, group);
-        let proof = group.schnorr_prove(&self.sk.value, &pk.value, &group.generator(), label);
+        let proof = group.schnorr_prove(&self.sk.value, &pk.value, group.generator(), label);
 
         (pk, proof)
     }
@@ -42,7 +42,7 @@ impl<E: Element, G: Group<E>> Keymaker<E, G> {
     }
 
     pub fn verify_share(group: &G, pk: &PublicKey<E, G>, proof: &Schnorr<E>, label: &[u8]) -> bool {
-        group.schnorr_verify(&pk.value, &group.generator(), &proof, label)
+        group.schnorr_verify(&pk.value, group.generator(), proof, label)
     }
 
     pub fn combine_pks(group: &G, pks: Vec<PublicKey<E, G>>) -> PublicKey<E, G> {
@@ -87,7 +87,7 @@ impl<E: Element, G: Group<E>> Keymaker<E, G> {
     pub fn joint_dec(group: &G, decs: Vec<E>, c: &Ciphertext<E>) -> E {
         let mut acc: E = decs[0].clone();
         for dec in decs.iter().skip(1) {
-            acc = acc.mul(&dec).modulo(&group.modulus());
+            acc = acc.mul(dec).modulo(&group.modulus());
         }
 
         c.a.div(&acc, &group.modulus()).modulo(&group.modulus())

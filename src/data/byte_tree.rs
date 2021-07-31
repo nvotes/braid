@@ -200,7 +200,7 @@ impl ToByteTree for Scalar {
 impl FromByteTree for Scalar {
     fn from_byte_tree(tree: &ByteTree) -> Result<Scalar, ByteError> {
         let bytes = tree.leaf()?;
-        let b32 = util::to_u8_32(&bytes);
+        let b32 = util::to_u8_32(bytes);
         Scalar::from_canonical_bytes(b32)
             .ok_or_else(|| ByteError::Msg(String::from("Failed constructing scalar")))
     }
@@ -215,7 +215,7 @@ impl ToByteTree for RistrettoPoint {
 impl FromByteTree for RistrettoPoint {
     fn from_byte_tree(tree: &ByteTree) -> Result<RistrettoPoint, ByteError> {
         let bytes = tree.leaf()?;
-        let b32 = util::to_u8_32(&bytes);
+        let b32 = util::to_u8_32(bytes);
         CompressedRistretto(b32)
             .decompress()
             .ok_or_else(|| ByteError::Msg(String::from("Failed constructing ristretto point")))
@@ -231,7 +231,7 @@ impl ToByteTree for Signature {
 impl FromByteTree for Signature {
     fn from_byte_tree(tree: &ByteTree) -> Result<Signature, ByteError> {
         let bytes = tree.leaf()?;
-        let b64 = util::to_u8_64(&bytes);
+        let b64 = util::to_u8_64(bytes);
         Ok(Signature::new(b64))
     }
 }
@@ -259,7 +259,7 @@ impl ToByteTree for SPublicKey {
 impl FromByteTree for SPublicKey {
     fn from_byte_tree(tree: &ByteTree) -> Result<SPublicKey, ByteError> {
         let bytes = tree.leaf()?;
-        let signature = SPublicKey::from_bytes(&bytes)?;
+        let signature = SPublicKey::from_bytes(bytes)?;
 
         Ok(signature)
     }
@@ -922,18 +922,10 @@ mod tests {
     use rand::Rng;
     use rug::Integer;
     use uuid::Uuid;
-    
-    #[test]
-    fn test_ciphertext_bytes() {
-        let group = RugGroup::default();
-        let c = util::random_ballots(1, &group).ciphertexts.remove(0);
-        let bytes = c.ser();
-        let back = Ciphertext::<Integer>::deser(&bytes).unwrap();
 
-        assert!(c.a == back.a && c.b == back.b);
-    }
-
-    fn test_config_bytes_generic<E: Element, G: Group<E>>(group: G) -> (Config<E, G>, Config<E, G>) {
+    fn test_config_bytes_generic<E: Element, G: Group<E>>(
+        group: G,
+    ) -> (Config<E, G>, Config<E, G>) {
         let mut csprng = OsRng;
         let id = Uuid::new_v4();
         let contests = 2;
@@ -959,9 +951,32 @@ mod tests {
         (cfg, back)
     }
 
+    fn test_ciphertext_bytes_generic<E: Element, G: Group<E>>(group: G)
+    /*-> (Ciphertext<E>, Ciphertext<E>)*/
+    {
+        let c = util::random_ballots(1, &group).ciphertexts.remove(0);
+        let bytes = c.ser();
+        let back = Ciphertext::<E>::deser(&bytes).unwrap();
+
+        assert!(c.a == back.a && c.b == back.b);
+    }
+
+    #[test]
+    fn test_ciphertext_bytes() {
+        let group = RugGroup::default();
+        test_ciphertext_bytes_generic(group);
+
+        let group = RistrettoGroup;
+        test_ciphertext_bytes_generic(group);
+    }
+
     #[test]
     fn test_config_bytes() {
         let group = RugGroup::default();
+        let (a, b) = test_config_bytes_generic(group);
+        assert_eq!(a, b);
+
+        let group = RistrettoGroup;
         let (a, b) = test_config_bytes_generic(group);
         assert_eq!(a, b);
     }

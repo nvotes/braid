@@ -105,10 +105,7 @@ impl GitBoard {
         let repo = self.open_or_clone()?;
         self.refresh(&repo)?;
         let walker = WalkDir::new(&self.fs_path).min_depth(1).into_iter();
-        let entries: Vec<DirEntry> = walker
-            .filter_entry(|e| !is_hidden(e))
-            .map(|e| e.unwrap())
-            .collect();
+        let entries = walker.filter_entry(|e| !is_hidden(e)).map(|e| e.unwrap());
 
         // filter directories and make relative
         let files = entries
@@ -205,13 +202,13 @@ impl GitBoard {
             }
             let refname = "refs/heads/master".to_string();
             let mut r = repo.find_reference(&refname)?;
-            fast_forward(&repo, &mut r, &commit)?;
+            fast_forward(repo, &mut r, &commit)?;
             info!("GIT refresh ffwd: [{}ms]", now.elapsed().as_millis());
             Ok(true)
         } else {
             warn!("GIT: refresh: merge required");
             let head_commit = repo.reference_to_annotated_commit(&head)?;
-            merge(&repo, &head_commit, &commit, "merge", self.append_only)?;
+            merge(repo, &head_commit, &commit, "merge", self.append_only)?;
             Ok(true)
         }
     }
@@ -299,7 +296,7 @@ impl GitBoard {
     ) -> Result<(), Error> {
         let entry = self.prepare_add(target, source);
 
-        add_and_commit(&repo, vec![entry], message, append_only)
+        add_and_commit(repo, vec![entry], message, append_only)
     }
 }
 
@@ -379,7 +376,7 @@ fn merge(
         Some("HEAD"),
         &signature,
         &signature,
-        &message,
+        message,
         &result_tree,
         &[&local_commit, &remote_commit],
     )?;
@@ -405,7 +402,7 @@ fn add_and_commit(
     }
     let oid = index.write_tree()?;
     let signature = Signature::now("braid", "braid@foo.bar")?;
-    let parent_commit = find_last_commit(&repo)?;
+    let parent_commit = find_last_commit(repo)?;
     let tree = repo.find_tree(oid)?;
 
     if append_only {
@@ -683,7 +680,8 @@ mod tests {
         assert!(result.is_err());
     }
 
-    #[ignore]
+    // FIXME remove large file test code
+    /*#[ignore]
     #[test]
     #[serial]
     pub fn test_git_config() {
@@ -705,10 +703,7 @@ mod tests {
         assert_eq!(window, window_cfg);
     }
 
-    #[ignore]
-    #[test]
-    #[serial]
-    pub fn test_git_large() {
+    pub fn _test_git_large() {
         let mut g1 = test_config();
         g1.append_only = false;
         fs::remove_dir_all(&g1.fs_path).ok();
@@ -749,5 +744,5 @@ mod tests {
         let now_ = std::time::Instant::now();
         g1.post().unwrap();
         println!(">> post {}", now_.elapsed().as_millis());
-    }
+    }*/
 }

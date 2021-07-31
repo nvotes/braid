@@ -81,7 +81,7 @@ impl<E: Element, G: Group<E>> PrivateKey<E, G> {
         c.b.mod_pow(&self.value, modulus)
     }
     pub fn from(secret: &E::Exp, group: &G) -> PrivateKey<E, G> {
-        let public_value = group.gmod_pow(&secret);
+        let public_value = group.gmod_pow(secret);
         PrivateKey {
             value: secret.clone(),
             group: group.clone(),

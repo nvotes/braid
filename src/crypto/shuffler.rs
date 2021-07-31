@@ -126,9 +126,9 @@ impl<'a, E: Element, G: Group<E>> Shuffler<'a, E, G> {
         perm: &[usize],
         label: &[u8],
     ) -> ShuffleProof<E> {
-        let (cs, rs) = self.gen_commitments(&perm, &self.pk.group);
+        let (cs, rs) = self.gen_commitments(perm, &self.pk.group);
         let perm_data = PermutationData {
-            permutation: &perm,
+            permutation: perm,
             commitments_c: &cs,
             commitments_r: &rs,
         };
@@ -164,7 +164,7 @@ impl<'a, E: Element, G: Group<E>> Shuffler<'a, E, G> {
         let (cs, rs) = (perm_data.commitments_c, perm_data.commitments_r);
         let perm = perm_data.permutation;
 
-        let us = hashing::shuffle_proof_us(&es, &e_primes, &cs, self.hasher, N, label);
+        let us = hashing::shuffle_proof_us(es, e_primes, cs, self.hasher, N, label);
 
         let mut u_primes: Vec<&E::Exp> = Vec::with_capacity(N);
         for &i in perm.iter() {
@@ -172,7 +172,7 @@ impl<'a, E: Element, G: Group<E>> Shuffler<'a, E, G> {
         }
 
         //        let now = std::time::Instant::now();
-        let (c_hats, r_hats) = self.gen_commitment_chain(h_initial, &u_primes, &group);
+        let (c_hats, r_hats) = self.gen_commitment_chain(h_initial, &u_primes, group);
         //        println!("CommitmentChain {}", now.elapsed().as_millis());
 
         // 0
@@ -261,7 +261,7 @@ impl<'a, E: Element, G: Group<E>> Shuffler<'a, E, G> {
         let y = YChallengeInput {
             es,
             e_primes,
-            cs: &cs,
+            cs,
             c_hats: &c_hats,
             pk: self.pk,
         };
@@ -289,7 +289,7 @@ impl<'a, E: Element, G: Group<E>> Shuffler<'a, E, G> {
         // 0
         for i in 0..N {
             let next_s_hat = omega_hats[i].add(&c.mul(&r_hats[i])).modulo(xmod);
-            let next_s_prime = omega_primes[i].add(&c.mul(&u_primes[i])).modulo(xmod);
+            let next_s_prime = omega_primes[i].add(&c.mul(u_primes[i])).modulo(xmod);
 
             s_hats.push(next_s_hat);
             s_primes.push(next_s_prime);
@@ -364,8 +364,8 @@ impl<'a, E: Element, G: Group<E>> Shuffler<'a, E, G> {
             u = u.mul(&us[i]).modulo(xmod);
 
             c_tilde = c_tilde.mul(&values[i].0).modulo(gmod);
-            a_prime = a_prime.mul(&&values[i].1).modulo(gmod);
-            b_prime = b_prime.mul(&&values[i].2).modulo(gmod);
+            a_prime = a_prime.mul(&values[i].1).modulo(gmod);
+            b_prime = b_prime.mul(&values[i].2).modulo(gmod);
             t_tilde3_temp = t_tilde3_temp.mul(&values[i].3).modulo(gmod);
             t_tilde41_temp = t_tilde41_temp.mul(&values[i].4).modulo(gmod);
             t_tilde42_temp = t_tilde42_temp.mul(&values[i].5).modulo(gmod);
@@ -498,7 +498,7 @@ impl<'a, E: Element, G: Group<E>> Shuffler<'a, E, G> {
             let c_temp = if i == 0 { initial } else { &cs[i - 1] };
 
             let second = c_temp
-                .mod_pow(&us[i], &group.modulus())
+                .mod_pow(us[i], &group.modulus())
                 .modulo(&group.modulus());
             let c = firsts[i].mul(&second).modulo(&group.modulus());
 
