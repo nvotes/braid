@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2021 David Ruescas <david@nvotes.com>
+
+SPDX-License-Identifier: AGPL-3.0-only
+-->
+
 ## Diagrams
 This folder contains diagrams for the most significant components of the braid mixnet.
 

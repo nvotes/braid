@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 David Ruescas <david@nvotes.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
 # This template contains all of the possible sections and their default values
 
 # Note that all fields that take a lint level have these possible values:
