@@ -918,7 +918,7 @@ mod tests {
     use rand::Rng;
     use rug::Integer;
     use uuid::Uuid;
-
+    
     #[test]
     fn test_ciphertext_bytes() {
         let group = RugGroup::default();
@@ -929,10 +929,8 @@ mod tests {
         assert!(c.a == back.a && c.b == back.b);
     }
 
-    #[test]
-    fn test_config_bytes() {
+    fn test_config_bytes_generic<E: Element, G: Group<E>>(group: G) -> (Config<E, G>, Config<E, G>) {
         let mut csprng = OsRng;
-        let group = RugGroup::default();
         let id = Uuid::new_v4();
         let contests = 2;
         let ballotbox_pk = Keypair::generate(&mut csprng).public;
@@ -943,7 +941,7 @@ mod tests {
             let keypair = Keypair::generate(&mut csprng);
             trustee_pks.push(keypair.public);
         }
-        let cfg: Config<Integer, RugGroup> = Config {
+        let cfg: Config<E, G> = Config {
             id: id.as_bytes().clone(),
             group: group,
             contests: contests,
@@ -953,9 +951,15 @@ mod tests {
         };
 
         let bytes = cfg.ser();
-        let back = Config::<Integer, RugGroup>::deser(&bytes).unwrap();
+        let back = Config::<E, G>::deser(&bytes).unwrap();
+        (cfg, back)
+    }
 
-        assert!(cfg == back);
+    #[test]
+    fn test_config_bytes() {
+        let group = RugGroup::default();
+        let (a, b) = test_config_bytes_generic(group);
+        assert_eq!(a, b);
     }
 
     #[test]

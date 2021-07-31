@@ -157,11 +157,8 @@ impl<'a, E: Element, G: Group<E>> Shuffler<'a, E, G> {
         let gmod = &group.modulus();
         let xmod = &group.exp_modulus();
 
-        //        let now = std::time::Instant::now();
-        // let (cs, rs) = self.gen_commitments(&perm, h_generators, &group);
         let (cs, rs) = (perm_data.commitments_c, perm_data.commitments_r);
         let perm = perm_data.permutation;
-        //        println!("Commitments {}", now.elapsed().as_millis());
 
         let us = hashing::shuffle_proof_us(&es, &e_primes, &cs, self.hasher, N, label);
 
@@ -527,74 +524,12 @@ fn gen_permutation(size: usize) -> Vec<usize> {
 
 #[cfg(test)]
 mod tests {
+    use rug::Integer;
     use std::fs::File;
 
-    use crate::crypto::backend::ristretto_b::*;
     use crate::crypto::backend::rug_b::*;
     use crate::crypto::group::*;
     use crate::crypto::shuffler::*;
-    use rug::Integer;
-
-    #[test]
-    fn test_ristretto_shuffle() {
-        let group = RistrettoGroup;
-        let challenger = &*group.challenger();
-
-        let sk = group.gen_key();
-        let pk = PublicKey::from(&sk.public_value, &group);
-
-        let n = 100;
-        let mut es = Vec::with_capacity(n);
-
-        for _ in 0..n {
-            let plaintext = group.rnd();
-            let c = pk.encrypt(&plaintext);
-            es.push(c);
-        }
-        let seed = vec![];
-        let hs = group.generators(es.len() + 1, 0, seed);
-        let shuffler = Shuffler {
-            pk: &pk,
-            generators: &hs,
-            hasher: challenger,
-        };
-
-        let (e_primes, rs, perm) = shuffler.gen_shuffle(&es);
-        let proof = shuffler.gen_proof(&es, &e_primes, &rs, &perm, &vec![]);
-        let ok = shuffler.check_proof(&proof, &es, &e_primes, &vec![]);
-
-        assert!(ok == true);
-    }
-
-    #[test]
-    fn test_rug_shuffle() {
-        let group = RugGroup::default();
-        let challenger = &*group.challenger();
-
-        let sk = group.gen_key();
-        let pk = PublicKey::from(&sk.public_value, &group);
-        let n = 100;
-        let mut es: Vec<Ciphertext<Integer>> = Vec::with_capacity(n);
-
-        for _ in 0..n {
-            let plaintext: Integer = group.encode(&group.rnd_exp());
-            let c = pk.encrypt(&plaintext);
-            es.push(c);
-        }
-        let seed = vec![];
-        let hs = group.generators(es.len() + 1, 0, seed);
-        let shuffler = Shuffler {
-            pk: &pk,
-            generators: &hs,
-            hasher: challenger,
-        };
-
-        let (e_primes, rs, perm) = shuffler.gen_shuffle(&es);
-        let proof = shuffler.gen_proof(&es, &e_primes, &rs, &perm, &vec![]);
-        let ok = shuffler.check_proof(&proof, &es, &e_primes, &vec![]);
-
-        assert!(ok == true);
-    }
 
     // experimental
     #[test]
@@ -641,6 +576,7 @@ mod tests {
         let ok = shuffler.check_proof(&proof2, &es2, &e_primes2, &vec![]);
         assert!(ok == true);
 
+        // FIXME: verify that this is sufficient to prove that the same permutation was used in both shuffles
         assert!(proof1.cs.len() == proof2.cs.len());
         for i in 0..n {
             assert!(proof1.cs[i].eq(&proof2.cs[i]));

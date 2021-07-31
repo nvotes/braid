@@ -7,7 +7,7 @@ use crate::data::byte_tree::{BTree, FromByteTree};
 
 pub trait Element: Clone + Eq + Send + Sync + Serialize + BTree {
     type Exp: Exponent;
-    type Plaintext: Send + Sync;
+    type Plaintext: Send + Sync + Eq + std::fmt::Debug;
 
     fn mul(&self, other: &Self) -> Self;
     fn div(&self, other: &Self, modulus: &Self) -> Self;
