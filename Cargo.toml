@@ -10,6 +10,7 @@ authors = [
   "Eduardo Robles <edulix@nvotes.com>"
 ]
 edition = "2018"
+license = "AGPL-3.0-only"
 
 [dependencies]
 rand = "0.7.3"
