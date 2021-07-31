@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 David Ruescas <david@nvotes.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 use aes::Aes256;
 use block_modes::block_padding::Pkcs7;
 use block_modes::{BlockMode, Cbc};

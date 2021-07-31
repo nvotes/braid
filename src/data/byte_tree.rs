@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 David Ruescas <david@nvotes.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 use std::convert::TryFrom;
 use std::convert::TryInto;
 use std::marker::PhantomData;

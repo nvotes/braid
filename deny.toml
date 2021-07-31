@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 David Ruescas <david@nvotes.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
 # This template contains all of the possible sections and their default values
 
 # Note that all fields that take a lint level have these possible values:
@@ -114,7 +118,9 @@ exceptions = [
     # if cargo deny detects them as GPL AND LGPL, it's GPL OR LGPL. And we allow
     # LGPL. That's why they are added here as exceptions.
     { allow = ["GPL-3.0", "LGPL-3.0"], name = "rug", version = "*" },
-    { allow = ["GPL-3.0", "LGPL-3.0"], name = "gmp-mpfr-sys", version = "*" }
+    { allow = ["GPL-3.0", "LGPL-3.0"], name = "gmp-mpfr-sys", version = "*" },
+    # This is our own package, so we don't mind its license :-)
+    { allow = ["AGPL-3.0"], name = "braid" }
 ]
 
 # Some crates don't have (easily) machine readable licensing information,

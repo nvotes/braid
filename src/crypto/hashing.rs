@@ -1,4 +1,9 @@
 #![allow(clippy::too_many_arguments)]
+
+// SPDX-FileCopyrightText: 2021 David Ruescas <david@nvotes.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 use std::marker::{Send, Sync};
 
 use curve25519_dalek::ristretto::RistrettoPoint;

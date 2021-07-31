@@ -1,4 +1,9 @@
 #![allow(clippy::new_without_default)]
+
+// SPDX-FileCopyrightText: 2021 David Ruescas <david@nvotes.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 use ed25519_dalek::Keypair;
 use generic_array::{typenum::U32, GenericArray};
 use log::info;

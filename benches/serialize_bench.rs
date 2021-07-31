@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 David Ruescas <david@nvotes.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 use braid::crypto::backend::ristretto_b::*;
 use braid::crypto::backend::rug_b::*;
 use braid::crypto::elgamal::*;

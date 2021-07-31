@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 David Ruescas <david@nvotes.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
 name: CI
 
 on: [push, pull_request]
@@ -117,3 +121,17 @@ jobs:
           log-level: warn
           command: check
           arguments: --all-features
+
+  license_reuse:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Check REUSE Compliance
+      run: |
+        pip install --user reuse
+        ~/.local/bin/reuse lint
