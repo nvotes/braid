@@ -120,7 +120,7 @@ exceptions = [
     { allow = ["GPL-3.0", "LGPL-3.0"], name = "rug", version = "*" },
     { allow = ["GPL-3.0", "LGPL-3.0"], name = "gmp-mpfr-sys", version = "*" },
     # This is our own package, so we don't mind its license :-)
-    { allow = ["AGPL-3.0-only", name = "braid"] }
+    { allow = ["AGPL-3.0"], name = "braid" }
 ]
 
 # Some crates don't have (easily) machine readable licensing information,
