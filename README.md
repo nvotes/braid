@@ -1,5 +1,6 @@
 <!--
 SPDX-FileCopyrightText: 2021 David Ruescas <david@nvotes.com>
+SPDX-FileCopyrightText: 2021 Eduardo Robles <edu@nvotes.com>
 
 SPDX-License-Identifier: AGPL-3.0-only
 -->
