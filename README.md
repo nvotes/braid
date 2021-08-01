@@ -1,15 +1,17 @@
 <!--
 SPDX-FileCopyrightText: 2021 David Ruescas <david@nvotes.com>
+SPDX-FileCopyrightText: 2021 Eduardo Robles <edu@nvotes.com>
 
 SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 # Braid
 
-[![License](https://img.shields.io/github/license/nvotes/braid)](License)
+[![License](https://img.shields.io/github/license/nvotes/braid?label=license)](https://github.com/nvotes/braid/blob/master/LICENSE)
 [![Build](https://github.com/nvotes/braid/workflows/CI/badge.svg)](https://github.com/nvotes/braid/actions?workflow=CI)
 [![Coverage status](https://img.shields.io/codecov/c/github/nvotes/braid)](https://codecov.io/gh/nvotes/braid/)
 [![Community chat](https://img.shields.io/discord/651538033291690014)](https://discord.gg/dfdnFWJ)
+[![Dependency status](https://deps.rs/repo/github/nvotes/braid/status.svg)](https://deps.rs/repo/github/nvotes/braid)
 
 ## nVotes verifiable re-encryption mixnet written in Rust
 
@@ -77,6 +79,9 @@ information (in master branch) to [codecov].
 [RustSec Advisory Database], unmaintained dependencies, incompatible licenses 
 and banned packages using [cargo-deny]. Use `cargo deny fix` or 
 `cargo deny --allow-incompatible` to try to solve the detected issues.
+7. **License compliance**: Check using [REUSE] for license compliance within
+the project, verifying that every file is REUSE-compliant and thus has a 
+copyright notice header.
 
 ## Papers
 
@@ -98,3 +103,4 @@ Shuffle proofs have been independently verified
 [codecov]: http://codecov.com/
 [RustSec Advisory Database]: https://github.com/RustSec/advisory-db/
 [cargo-deny]: https://crates.io/crates/cargo-deny
+[REUSE]: https://reuse.software
