@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 # Braid
 
-[![License](https://img.shields.io/github/license/nvotes/braid)](https://github.com/nvotes/braid/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/nvotes/braid?label=license)](https://github.com/nvotes/braid/blob/master/LICENSE)
 [![Build](https://github.com/nvotes/braid/workflows/CI/badge.svg)](https://github.com/nvotes/braid/actions?workflow=CI)
 [![Coverage status](https://img.shields.io/codecov/c/github/nvotes/braid)](https://codecov.io/gh/nvotes/braid/)
 [![Community chat](https://img.shields.io/discord/651538033291690014)](https://discord.gg/dfdnFWJ)
