@@ -79,6 +79,9 @@ information (in master branch) to [codecov].
 [RustSec Advisory Database], unmaintained dependencies, incompatible licenses 
 and banned packages using [cargo-deny]. Use `cargo deny fix` or 
 `cargo deny --allow-incompatible` to try to solve the detected issues.
+7. **License compliance**: Check using [REUSE] for license compliance within
+the project, verifying that every file is REUSE-compliant and thus has a 
+copyright notice header.
 
 ## Papers
 
@@ -100,3 +103,4 @@ Shuffle proofs have been independently verified
 [codecov]: http://codecov.com/
 [RustSec Advisory Database]: https://github.com/RustSec/advisory-db/
 [cargo-deny]: https://crates.io/crates/cargo-deny
+[REUSE]: https://reuse.software
