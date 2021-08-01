@@ -920,12 +920,16 @@ mod tests {
     use ed25519_dalek::Keypair;
     use rand::rngs::OsRng;
     use rand::Rng;
+    use rand::RngCore;
     use rug::Integer;
     use uuid::Uuid;
 
-    fn test_config_bytes_generic<E: Element, G: Group<E>>(
+    fn test_config_bytes_generic<
+        E: Element + std::fmt::Debug,
+        G: Group<E> + Eq + std::fmt::Debug,
+    >(
         group: G,
-    ) -> (Config<E, G>, Config<E, G>) {
+    ) {
         let mut csprng = OsRng;
         let id = Uuid::new_v4();
         let contests = 2;
@@ -948,12 +952,10 @@ mod tests {
 
         let bytes = cfg.ser();
         let back = Config::<E, G>::deser(&bytes).unwrap();
-        (cfg, back)
+        assert_eq!(cfg, back);
     }
 
-    fn test_ciphertext_bytes_generic<E: Element, G: Group<E>>(group: G)
-    /*-> (Ciphertext<E>, Ciphertext<E>)*/
-    {
+    fn test_ciphertext_bytes_generic<E: Element, G: Group<E>>(group: G) {
         let c = util::random_ballots(1, &group).ciphertexts.remove(0);
         let bytes = c.ser();
         let back = Ciphertext::<E>::deser(&bytes).unwrap();
@@ -961,46 +963,22 @@ mod tests {
         assert!(c.a == back.a && c.b == back.b);
     }
 
-    #[test]
-    fn test_ciphertext_bytes() {
-        let group = RugGroup::default();
-        test_ciphertext_bytes_generic(group);
-
-        let group = RistrettoGroup;
-        test_ciphertext_bytes_generic(group);
-    }
-
-    #[test]
-    fn test_config_bytes() {
-        let group = RugGroup::default();
-        let (a, b) = test_config_bytes_generic(group);
-        assert_eq!(a, b);
-
-        let group = RistrettoGroup;
-        let (a, b) = test_config_bytes_generic(group);
-        assert_eq!(a, b);
-    }
-
-    #[test]
-    fn test_key_bytes() {
-        let group = RugGroup::default();
+    fn test_key_bytes_generic<E: Element, G: Group<E> + Eq>(group: G) {
         let sk = group.gen_key();
         let pk = PublicKey::from(&sk.public_value, &group);
 
         let bytes = sk.ser();
-        let back = PrivateKey::<Integer, RugGroup>::deser(&bytes).unwrap();
+        let back = PrivateKey::<E, G>::deser(&bytes).unwrap();
 
         assert!(sk == back);
 
         let bytes = pk.ser();
-        let back = PublicKey::<Integer, RugGroup>::deser(&bytes).unwrap();
+        let back = PublicKey::<E, G>::deser(&bytes).unwrap();
 
         assert!(pk == back);
     }
 
-    #[test]
-    fn test_schnorr_bytes() {
-        let group = RugGroup::default();
+    fn test_schnorr_bytes_generic<E: Element, G: Group<E>>(group: G) {
         let g = group.generator();
         let secret = group.rnd_exp();
         let public = g.mod_pow(&secret, &group.modulus());
@@ -1009,16 +987,14 @@ mod tests {
         assert!(verified == true);
 
         let bytes = schnorr.ser();
-        let back = Schnorr::<Integer>::deser(&bytes).unwrap();
+        let back = Schnorr::<E>::deser(&bytes).unwrap();
         assert!(schnorr == back);
 
         let verified = group.schnorr_verify(&public, &g, &back, &vec![]);
         assert!(verified == true);
     }
 
-    #[test]
-    fn test_cp_bytes() {
-        let group = RugGroup::default();
+    fn test_cp_bytes_generic<E: Element, G: Group<E>>(group: G) {
         let g1 = group.generator();
         let g2 = group.rnd();
         let secret = group.rnd_exp();
@@ -1029,21 +1005,16 @@ mod tests {
         assert!(verified == true);
 
         let bytes = proof.ser();
-        let back = ChaumPedersen::<Integer>::deser(&bytes).unwrap();
+        let back = ChaumPedersen::<E>::deser(&bytes).unwrap();
         assert!(proof == back);
 
         let verified = group.cp_verify(&public1, &public2, None, &g2, &back, &vec![]);
         assert!(verified == true);
     }
 
-    #[test]
-    fn test_epk_bytes() {
-        let group = RugGroup::default();
-
+    fn test_epk_bytes_generic<E: Element, G: Group<E>>(group: G, plaintext: E::Plaintext) {
         let sk = group.gen_key();
         let pk = PublicKey::from(&sk.public_value, &group);
-
-        let plaintext = group.rnd_exp();
 
         let encoded = group.encode(&plaintext);
         let c = pk.encrypt(&encoded);
@@ -1059,10 +1030,7 @@ mod tests {
         assert_eq!(d, plaintext);
     }
 
-    #[test]
-    fn test_share_bytes() {
-        let group = RugGroup::default();
-
+    fn test_share_bytes_generic<E: Element, G: Group<E> + Eq>(group: G) {
         let km = Keymaker::gen(&group);
         let (pk, proof) = km.share(&vec![]);
 
@@ -1076,36 +1044,30 @@ mod tests {
         };
 
         let bytes = share.ser();
-        let back = Keyshare::<Integer, RugGroup>::deser(&bytes).unwrap();
+        let back = Keyshare::<E, G>::deser(&bytes).unwrap();
 
         assert!(share.share == back.share);
         assert!(share.proof == back.proof);
         assert!(share.encrypted_sk == back.encrypted_sk);
     }
 
-    #[test]
-    fn test_ballots_bytes() {
-        let group = RugGroup::default();
+    fn test_ballots_bytes_generic<E: Element, G: Group<E>>(group: G) {
         let bs = util::random_ballots(1000, &group);
         let bytes = bs.ser();
-        let back = Ballots::<Integer>::deser(&bytes).unwrap();
+        let back = Ballots::<E>::deser(&bytes).unwrap();
 
         assert!(bs == back);
     }
 
-    #[test]
-    fn test_mix_bytes() {
-        let group = RugGroup::default();
+    fn test_mix_bytes_generic<E: Element, G: Group<E>>(group: G, data: Vec<E::Plaintext>) {
         let challenger = &*group.challenger();
 
         let sk = group.gen_key();
         let pk = PublicKey::from(&sk.public_value, &group);
-        let n = 100;
+        let mut es: Vec<Ciphertext<E>> = vec![];
 
-        let mut es: Vec<Ciphertext<Integer>> = Vec::with_capacity(10);
-
-        for _ in 0..n {
-            let plaintext: Integer = group.encode(&group.rnd_exp());
+        for plaintext in data {
+            let plaintext = group.encode(&plaintext);
             let c = pk.encrypt(&plaintext);
             es.push(c);
         }
@@ -1127,25 +1089,148 @@ mod tests {
             proof: proof,
         };
         let bytes = mix.ser();
-        let back = Mix::<Integer>::deser(&bytes).unwrap();
+        let back = Mix::<E>::deser(&bytes).unwrap();
 
         assert!(mix.mixed_ballots == back.mixed_ballots);
         let ok = shuffler.check_proof(&back.proof, &es, &back.mixed_ballots, &vec![]);
         assert!(ok == true);
     }
 
-    #[test]
-    fn test_plaintexts_bytes() {
-        let group = RugGroup::default();
-        let plaintexts: Vec<Integer> = (0..100)
-            .into_iter()
-            .map(|_| group.encode(&group.rnd_exp()))
-            .collect();
+    fn test_plaintexts_bytes_generic<E: Element, G: Group<E>>(group: G, data: Vec<E::Plaintext>) {
+        let mut plaintexts: Vec<E> = vec![];
+
+        for plaintext in data {
+            plaintexts.push(group.encode(&plaintext));
+        }
         let ps = Plaintexts { plaintexts };
         let bytes = ps.ser();
-        let back = Plaintexts::<Integer>::deser(&bytes).unwrap();
+        let back = Plaintexts::<E>::deser(&bytes).unwrap();
 
         assert!(ps == back);
+    }
+
+    #[test]
+    fn test_ciphertext_bytes() {
+        let group = RugGroup::default();
+        test_ciphertext_bytes_generic(group);
+
+        let group = RistrettoGroup;
+        test_ciphertext_bytes_generic(group);
+    }
+
+    #[test]
+    fn test_config_bytes() {
+        let group = RugGroup::default();
+        test_config_bytes_generic(group);
+
+        let group = RistrettoGroup;
+        test_config_bytes_generic(group);
+    }
+
+    #[test]
+    fn test_key_bytes() {
+        let group = RugGroup::default();
+        test_key_bytes_generic(group);
+
+        let group = RistrettoGroup;
+        test_key_bytes_generic(group);
+    }
+
+    #[test]
+    fn test_schnorr_bytes() {
+        let group = RugGroup::default();
+        test_schnorr_bytes_generic(group);
+
+        let group = RistrettoGroup;
+        test_schnorr_bytes_generic(group);
+    }
+
+    #[test]
+    fn test_cp_bytes() {
+        let group = RugGroup::default();
+        test_cp_bytes_generic(group);
+
+        let group = RistrettoGroup;
+        test_cp_bytes_generic(group);
+    }
+
+    #[test]
+    fn test_epk_bytes() {
+        let mut csprng = OsRng;
+
+        let group = RugGroup::default();
+        let plaintext = group.rnd_exp();
+        test_epk_bytes_generic(group, plaintext);
+
+        let group = RistrettoGroup;
+        let mut fill = [0u8; 30];
+        csprng.fill_bytes(&mut fill);
+        let plaintext = util::to_u8_30(&fill.to_vec());
+        test_epk_bytes_generic(group, plaintext);
+    }
+
+    #[test]
+    fn test_share_bytes() {
+        let group = RugGroup::default();
+        test_share_bytes_generic(group);
+
+        let group = RistrettoGroup;
+        test_share_bytes_generic(group);
+    }
+
+    #[test]
+    fn test_ballots_bytes() {
+        let group = RugGroup::default();
+        test_ballots_bytes_generic(group);
+
+        let group = RistrettoGroup;
+        test_ballots_bytes_generic(group);
+    }
+
+    #[test]
+    fn test_mix_bytes() {
+        let mut csprng = OsRng;
+
+        let group = RugGroup::default();
+        let mut ps = vec![];
+        for _ in 0..10 {
+            let p = group.rnd_exp();
+            ps.push(p);
+        }
+        test_mix_bytes_generic(group, ps);
+
+        let group = RistrettoGroup;
+        let mut ps = vec![];
+        for _ in 0..10 {
+            let mut fill = [0u8; 30];
+            csprng.fill_bytes(&mut fill);
+            let p = util::to_u8_30(&fill.to_vec());
+            ps.push(p);
+        }
+        test_mix_bytes_generic(group, ps);
+    }
+
+    #[test]
+    fn test_plaintexts_bytes() {
+        let mut csprng = OsRng;
+
+        let group = RugGroup::default();
+        let mut ps = vec![];
+        for _ in 0..10 {
+            let p = group.rnd_exp();
+            ps.push(p);
+        }
+        test_plaintexts_bytes_generic(group, ps);
+
+        let group = RistrettoGroup;
+        let mut ps = vec![];
+        for _ in 0..10 {
+            let mut fill = [0u8; 30];
+            csprng.fill_bytes(&mut fill);
+            let p = util::to_u8_30(&fill.to_vec());
+            ps.push(p);
+        }
+        test_plaintexts_bytes_generic(group, ps);
     }
 
     #[test]
