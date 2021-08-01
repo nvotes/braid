@@ -18,8 +18,8 @@ rug = {version = "1.12", features = ["integer", "rand", "serde"]}
 # curve25519-dalek = { package = "curve25519-dalek-ng", version = "4", features=["serde"] }
 curve25519-dalek = {version = "3", features = ["serde"]}
 ed25519-dalek = {version = "1", features = ["serde"]}
-aes = "0.6.0"
-block-modes = "0.7.0"
+aes = "0.7.4"
+block-modes = "0.8.1"
 sha2 = "0.9.1"
 sha3 = "0.9.1"
 rayon = "1.5"
@@ -37,17 +37,17 @@ hex-literal = "0.3.1"
 hex = "0.4.2"
 generic-array = "0.14.4"
 base64 = "0.13.0"
-strum = { version = "0.20", features = ["derive"] }
+strum = { version = "0.21.0", features = ["derive"] }
 num_enum = "0.5.1"
 log = "0.4.11"
-simplelog = "0.9.0"
+simplelog = "0.10.0"
 quick-error = "2.0.0"
 
 [dev-dependencies]
 criterion = "0.3.4"
 serial_test = "0.5.0"
 regex = "1"
-cursive = "0.15"
+cursive = "0.16.3"
 
 [[bench]]
 name = "shuffle_bench"

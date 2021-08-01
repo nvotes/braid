@@ -208,6 +208,7 @@ mod tests {
                 LevelFilter::Info,
                 simplelog::Config::default(),
                 TerminalMode::Mixed,
+                ColorChoice::Auto
             )])
             .unwrap();
         });
